@@ -5,6 +5,7 @@
   <label for="y">Y</label><input onkeyup="changePin(this)" type="number" name='y'>
 </div>
 <script type="text/javascript">
+  debug = true;
   bgImg = "";
   ctx = "";
   pins = [];
@@ -30,15 +31,16 @@
     ctx.width = width;
     ctx.height = height;
 
-    reloadCanvas();
-
+    reloadCanvas();//loads canvas items
 
   }
 
   function reloadCanvas() {
+    if (debug) console.log("reloaded canvas");
     ctx.clearRect(0,0,ctx.width,ctx.height);
     ctx.drawImage(bgImg,0,0);
-    loadPins(ctx);
+    loadPins();
+    createPins();
 
   }
 
@@ -48,12 +50,16 @@
     return bg;
   }
 
-  function loadPins(ctx) {
+  function loadPins() {
+    //TODO:
+    //php ajax call to get the pins from a text file and convert it to json.
+    
+  }
+
+  function createPins() {
     for (var i = 0; i < pins.length; i++) {
       createPin(pins[i][1],pins[i][2]);
     }
-    //TODO:
-    //php ajax call to get the pins from a text file and convert it to json.
   }
 
   function createPin(mcX,mcY) {
@@ -76,7 +82,6 @@
     pins[0][1] = inputs[1].value;
     pins[0][2] = inputs[2].value;
     reloadCanvas();
-    console.log(inputs[1].value);
   }
 </script>
 <?php
