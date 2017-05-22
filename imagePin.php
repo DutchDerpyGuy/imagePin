@@ -12,13 +12,28 @@
     ctx.width = width;
     ctx.height = height;
     ctx.drawImage(getBackground(img),0,0);
+    loadPins(ctx);
 
+    cv.addEventListener('click', function(e) {
+      creatPin(e);
+    });
   }
 
   function getBackground(url) {
     bg = new Image();
     bg.src = url;
     return bg;
+  }
+
+  function loadPins(ctx) {
+    //TODO:
+    //php ajax call to get the pins from a text file and convert it to json.
+  }
+
+  function creatPin(event) {
+    //TODO:
+    //make pin
+    console.log(event);
   }
 </script>
 
