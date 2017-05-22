@@ -3,6 +3,10 @@
   <label for="name" >Name</label><input onkeyup="reloadCanvas()" id='pinName' type="text" name='name'>
   <label for="x">X</label><input onkeyup="reloadCanvas()" id='pinX' type="number" name='x'>
   <label for="y">Y</label><input onkeyup="reloadCanvas()" id='pinY' type="number" name='y'>
+  <form id='savepins' action="savePlaces.php" method="post">
+    <input type="hidden" id='json' name="json" value="">
+    <button type="button" onclick="savePins()">Add it!</button>
+  </form>
 </div>
 <script type="text/javascript">
   bgImg = "";
@@ -64,11 +68,12 @@
   }
 
   function savePins(){
+    form = document.getElementById('savepins');
+
     loadPins();
-    text = JSON.stringify(pins)
-    console.log(text);
-    //TODO:
-    //save this to the file! (full replace)
+    text = JSON.stringify(pins);
+    form.children[0].value = text;
+    form.submit();
   }
 
   function createPins() {
