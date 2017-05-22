@@ -2,7 +2,7 @@
 <script type="text/javascript">
   window.onload = init();
   function init() {
-    img = "img.jpg"; // I don't have the rights to this image. it's just a placeholder!
+    img = "img.png"; //made by mineatlast
     width = 800;
     height = 600;
 
