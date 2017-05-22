@@ -1,26 +1,17 @@
 <canvas id="image">You don't have Javascript enabled! <a href="http://www.enable-javascript.com/">Click here to find out how to turn it on!</a></canvas>
-<div class="addPlace">
-  <label for="name" >Name</label><input onkeyup="changePin(this)" type="text" name='name'>
-  <label for="x">X</label><input onkeyup="changePin(this)" type="number" name='x'>
-  <label for="y">Y</label><input onkeyup="changePin(this)" type="number" name='y'>
+<div id="addPlace">
+  <label for="name" >Name</label><input onkeyup="reloadCanvas()" id='pinName' type="text" name='name'>
+  <label for="x">X</label><input onkeyup="reloadCanvas()" id='pinX' type="number" name='x'>
+  <label for="y">Y</label><input onkeyup="reloadCanvas()" id='pinY' type="number" name='y'>
 </div>
 <script type="text/javascript">
-  debug = true;
   bgImg = "";
   ctx = "";
   pins = [];
-  pins.push(['',100,1000],['spawn',-7,178]);
+
   window.onload = init();
   function init() {
-    /*
-    mapsize:
-    top y: -1424
-    right x: 6505
-    bottom y: 2642
-    left x: -5399
-    */
     bgImg = getBackground("img.png"); //pic made by mineatlast
-    bgImg
     width = bgImg.width;
     height = bgImg.height;
     cv = document.getElementById('image');
@@ -32,16 +23,16 @@
     ctx.height = height;
 
     reloadCanvas();//loads canvas items
-
+    //reloads canvas every 10 secs.
+    setInterval(function() {
+      reloadCanvas();
+    }, 10000);
   }
 
   function reloadCanvas() {
-    if (debug) console.log("reloaded canvas");
     ctx.clearRect(0,0,ctx.width,ctx.height);
     ctx.drawImage(bgImg,0,0);
     loadPins();
-    createPins();
-
   }
 
   function getBackground(url) {
@@ -51,9 +42,33 @@
   }
 
   function loadPins() {
+
+    xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        inputs = document.getElementById('addPlace').querySelectorAll('input');
+        pins = [[inputs[0].value,inputs[1].value,inputs[2].value]];
+
+        jsonString = this.responseText;
+        places = JSON.parse(jsonString);
+        pins = pins.concat(places);
+
+        createPins();
+      }
+    };
+    xhttp.open("GET", 'places.txt', true);
+    xhttp.send();
     //TODO:
     //php ajax call to get the pins from a text file and convert it to json.
-    
+
+  }
+
+  function savePins(){
+    loadPins();
+    text = JSON.stringify(pins)
+    console.log(text);
+    //TODO:
+    //save this to the file! (full replace)
   }
 
   function createPins() {
@@ -63,10 +78,8 @@
   }
 
   function createPin(mcX,mcY) {
-    //TODO:
-    //make pin
-    mapWidth=11904;
-    mapHeight=4066;
+    mapWidth=1952;
+    mapHeight=1980;
     xRatio = mapWidth/ctx.width;
     yRatio = mapHeight/ctx.height;
     cvX = ctx.width/2 + mcX/xRatio;
@@ -74,14 +87,6 @@
     var pinImg = new Image();
     pinImg.src = "pin.png";
     ctx.drawImage(pinImg,cvX-(pinImg.width/2),cvY-pinImg.height);
-  }
-
-  function  changePin(el) {
-    inputs = el.parentElement.querySelectorAll('input');
-    pins[0][0] = inputs[0].value;
-    pins[0][1] = inputs[1].value;
-    pins[0][2] = inputs[2].value;
-    reloadCanvas();
   }
 </script>
 <?php
