@@ -79,11 +79,11 @@
 
   function createPins() {
     for (var i = 0; i < pins.length; i++) {
-      createPin(pins[i][1],pins[i][2]);
+      createPin(pins[i][0],pins[i][1],pins[i][2]);
     }
   }
 
-  function createPin(mcX,mcY) {
+  function createPin(name,mcX,mcY) {
     mapWidth=1952;
     mapHeight=1980;
     xRatio = mapWidth/ctx.width;
@@ -93,6 +93,10 @@
     var pinImg = new Image();
     pinImg.src = "pin.png";
     ctx.drawImage(pinImg,cvX-(pinImg.width/2),cvY-pinImg.height);
+    ctx.font = "20px Arial";
+    ctx.textAlign = "center";
+    ctx.fillStyle="#eee";
+    ctx.fillText(name,cvX,cvY-pinImg.height - 5);
   }
 
   function listAllPlaces() {
