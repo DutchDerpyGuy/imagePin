@@ -1,22 +1,36 @@
-<canvas id="image" width="800" height="600">You don't have Javascript enabled! <a href="http://www.enable-javascript.com/">Click here to find out how to turn it on!</a></canvas>
+<style>
+  body {margin:0}
+</style>
+<canvas id="image">You don't have Javascript enabled! <a href="http://www.enable-javascript.com/">Click here to find out how to turn it on!</a></canvas>
 <script type="text/javascript">
   window.onload = init();
   function init() {
-    img = "img.png"; //made by mineatlast
-    width = 800;
-    height = 600;
+    /*
+    mapsize:
+    top y: -1424
+    right x: 6505
+    bottom y: 2642
+    left x: -5399
+    */
+
+
+    img = getBackground("img.png"); //pic made by mineatlast
+    width = img.width;
+    height = img.height;
 
     cv = document.getElementById('image');
+    cv.width = width;
+    cv.height = height;
     cv.innerHTML = "";
     ctx = cv.getContext('2d');
     ctx.width = width;
     ctx.height = height;
-    ctx.drawImage(getBackground(img),0,0);
+    ctx.drawImage(img,0,0);
+
+    createPin(ctx,-7,178); // spawn
     loadPins(ctx);
 
-    cv.addEventListener('click', function(e) {
-      creatPin(e);
-    });
+
   }
 
   function getBackground(url) {
@@ -30,13 +44,21 @@
     //php ajax call to get the pins from a text file and convert it to json.
   }
 
-  function creatPin(event) {
+  function createPin(ctx, mcX,mcY) {
     //TODO:
     //make pin
-    console.log(event);
+    mapWidth=11904;
+    mapHeight=4066;
+    xRatio = mapWidth/ctx.width;
+    yRatio = mapHeight/ctx.height;
+    cvX = ctx.width/2 + mcX/xRatio;
+    cvY = ctx.height/2 + mcY/yRatio;
+    console.log(cvX);
+    var pinImg = new Image();
+    pinImg.src = "pin.png";
+    ctx.drawImage(pinImg,cvX-(pinImg.width/2),cvY-pinImg.height);
   }
 </script>
-
 <?php
 
 ?>
