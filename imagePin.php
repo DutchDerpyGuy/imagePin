@@ -1,3 +1,4 @@
+
 <canvas id="image">You don't have Javascript enabled! <a href="http://www.enable-javascript.com/">Click here to find out how to turn it on!</a></canvas>
 <div id="addPlace">
   <label for="name" >Name</label><input onkeyup="reloadCanvas()" id='pinName' type="text" name='name'>
@@ -7,6 +8,7 @@
     <input type="hidden" id='json' name="json" value="">
     <button type="button" onclick="savePins()">Add it!</button>
   </form>
+  <table id="places"></table>
 </div>
 <script type="text/javascript">
   bgImg = "";
@@ -46,7 +48,6 @@
   }
 
   function loadPins() {
-
     xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
@@ -58,22 +59,22 @@
         pins = pins.concat(places);
 
         createPins();
+        listAllPlaces();
       }
     };
-    xhttp.open("GET", 'places.txt', true);
+    xhttp.open("GET", 'places.txt?', true);
     xhttp.send();
-    //TODO:
-    //php ajax call to get the pins from a text file and convert it to json.
-
   }
 
   function savePins(){
     form = document.getElementById('savepins');
-
-    loadPins();
-    text = JSON.stringify(pins);
-    form.children[0].value = text;
-    form.submit();
+    inputs = document.getElementById('addPlace').querySelectorAll('input');
+    if (inputs[0] && inputs[1] && inputs[2] ) {
+      loadPins();
+      text = JSON.stringify(pins);
+      form.children[0].value = text;
+      form.submit();
+    } else alert("can't have a field empty! :)");
   }
 
   function createPins() {
@@ -92,6 +93,15 @@
     var pinImg = new Image();
     pinImg.src = "pin.png";
     ctx.drawImage(pinImg,cvX-(pinImg.width/2),cvY-pinImg.height);
+  }
+
+  function listAllPlaces() {
+    table = document.getElementById('places');
+    table.innerHTML= "<thead><th>Name</th><th>X</th><th>Y</th></thead><tbody>";
+    for (var i = 0; i < pins.length; i++) {
+      table.innerHTML+= "<tr><td>"+pins[i][0]+"</td>"+"<td>"+pins[i][1]+"</td>"+"<td>"+pins[i][2]+"</td></tr>"
+    }
+    table.innerHTML+="</tbody>"
   }
 </script>
 <?php
