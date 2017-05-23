@@ -1,0 +1,196 @@
+<style>
+  /*
+    I'm awere I'm doing styling outside the head, in the file. just want everything here for now :)
+  */
+
+  body {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #3D3D3D;
+    color: #fff;
+  }
+
+  .content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  .content>* {
+    padding: 2vh 2vw;
+    border: 3px solid #8AC007;
+    border-radius: 25px;
+    min-height: 40%;
+  }
+
+  .content canvas {
+    border: none;
+  }
+
+  #addPlace {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  #addPlace input {
+    width: 50%;
+    margin: 5px auto;
+    border: 3px solid #8AC007;
+    padding: 5px;
+    transition: width 500ms ease-in-out;
+  }
+
+  #addPlace input:focus {
+    width: 100%
+  }
+
+  #addPlace form button {
+    border: 3px solid #fff;
+    padding: 15px 32px;
+    background: #8AC007;
+    color: #fff;
+    margin: 5px 0;
+    width: 100%;
+    transition: border 500ms ease-in-out;
+  }
+
+  #addPlace form button:hover {
+    border: 3px solid #8AC007;
+  }
+
+  #places td,
+  #places th {
+    min-width: 100px;
+    text-align: center;
+  }
+
+  h2 {
+    margin: 0;
+    text-align: center;
+  }
+</style>
+<div class="header">
+
+</div>
+<div class="content">
+  <canvas id="image">You don't have Javascript enabled! <a href="http://www.enable-javascript.com/">Click here to find out how to turn it on!</a></canvas>
+  <div id="addPlace">
+    <h2>Add your place!</h2>
+    <label for="name">Name</label><input onkeyup="reloadCanvas()" id="pinName" type="text" name="name">
+    <label for="x">X</label><input onkeyup="reloadCanvas()" id="pinX" type="number" name="x">
+    <label for="z">Z</label><input onkeyup="reloadCanvas()" id="pinY" type="number" name="z">
+    <form id="savepins" action="savePlaces.php" method="post">
+      <input type="hidden" id="json" name="json" value="">
+      <button type="button" onclick="savePins()">Add it!</button>
+    </form>
+  </div>
+  <div>
+    <h2>Places:</h2>
+    <table id="places"></table>
+  </div>
+  <script type="text/javascript">
+    bgImg = "";
+    ctx = "";
+    pins = [];
+
+    window.onload = init();
+
+    function init() {
+      bgImg = getBackground("img.png"); //pic made by mineatlast
+      width = bgImg.width;
+      height = bgImg.height;
+      cv = document.getElementById('image');
+      cv.width = width;
+      cv.height = height;
+      cv.innerHTML = "";
+      ctx = cv.getContext('2d');
+      ctx.width = width;
+      ctx.height = height;
+
+      reloadCanvas(); //loads canvas items
+      //reloads canvas every 10 secs.
+      setInterval(function() {
+        reloadCanvas();
+      }, 10000);
+    }
+
+    function reloadCanvas() {
+      ctx.clearRect(0, 0, ctx.width, ctx.height);
+      ctx.drawImage(bgImg, 0, 0);
+      loadPins();
+    }
+
+    function getBackground(url) {
+      bg = new Image();
+      bg.src = url;
+      return bg;
+    }
+
+    function loadPins() {
+      xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          inputs = document.getElementById('addPlace').querySelectorAll('input');
+          pins = [
+            [inputs[0].value, inputs[1].value, inputs[2].value]
+          ];
+
+          jsonString = this.responseText;
+          places = JSON.parse(jsonString);
+          pins = pins.concat(places);
+
+          createPins();
+          listAllPlaces();
+        }
+      };
+      xhttp.open("GET", 'places.txt?', true);
+      xhttp.send();
+    }
+
+    function savePins() {
+      form = document.getElementById('savepins');
+      inputs = document.getElementById('addPlace').querySelectorAll('input');
+      if (inputs[0] && inputs[1] && inputs[2]) {
+        loadPins();
+        text = JSON.stringify(pins);
+        form.children[0].value = text;
+        form.submit();
+      } else alert("can't have a field empty! :)");
+    }
+
+    function createPins() {
+      for (var i = 0; i < pins.length; i++) {
+        createPin(pins[i][0], pins[i][1], pins[i][2]);
+      }
+    }
+
+    function createPin(name, mcX, mcZ) {
+      mapWidth = 1952;
+      mapHeight = 1980;
+      xRatio = mapWidth / ctx.width;
+      zRatio = mapHeight / ctx.height;
+      cvX = ctx.width / 2 + mcX / xRatio;
+      cvZ = ctx.height / 2 + mcZ / zRatio;
+      var pinImg = new Image();
+      pinImg.src = "pin.png";
+      ctx.drawImage(pinImg, cvX - (pinImg.width / 2), cvZ - pinImg.height);
+      ctx.font = "20px Arial";
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#eee";
+      ctx.fillText(name, cvX, cvZ - pinImg.height - 5);
+    }
+
+    function listAllPlaces() {
+      table = document.getElementById('places');
+      table.innerHTML = "<thead><th>Name</th><th>X</th><th>Z</th></thead><tbody>";
+      for (var i = 0; i < pins.length; i++) {
+        table.innerHTML += "<tr><td>" + pins[i][0] + "</td>" + "<td>" + pins[i][1] + "</td>" + "<td>" + pins[i][2] + "</td></tr>"
+      }
+      table.innerHTML += "</tbody>"
+    }
+  </script>
+</div>
